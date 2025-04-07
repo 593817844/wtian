@@ -2,7 +2,41 @@ from lunar_python import Solar, Lunar
 from datetime import datetime
 
 
+async def calculate_wuxing(bazi_list: list)->list:
+    tiangan_wuxing = {
+        '甲': '木', '乙': '木',  # 甲乙属木
+        '丙': '火', '丁': '火',  # 丙丁属火
+        '戊': '土', '己': '土',  # 戊己属土
+        '庚': '金', '辛': '金',  # 庚辛属金
+        '壬': '水', '癸': '水',  # 壬癸属水
+    }
+    dizhi_wuxing = {
+        '子': '水', '亥': '水',  # 子亥属水
+        '寅': '木', '卯': '木',  # 寅卯属木
+        '巳': '火', '午': '火',  # 巳午属火
+        '丑': '土', '辰': '土', '未': '土', '戌': '土',  # 丑辰未戌属土
+        '申': '金', '酉': '金',  # 申酉属金
+    }
+    # 八字为4柱，每柱包含一个天干和一个地支
+    elements = {'木': 0, '火': 0, '土': 0, '金': 0, '水': 0}
+     
+    for s in bazi_list:
+        tangan = tiangan_wuxing[s[0]]
+        dizhi= dizhi_wuxing[s[1]]
+        elements[tangan] += 1
+        elements[dizhi] += 1
+        
+    total = sum(elements.values())  # 8
 
+    elements_percentage = {}  # 创建空字典
+    for key, value in elements.items():
+        elements_percentage[key] = (value / total) * 100  # 计算并赋值
+        
+    return elements_percentage
+        
+    
+    
+    print(bazi_str)
 
 async def calculate_shishen(bazi_list: list)->list:
 
@@ -123,11 +157,13 @@ async def calculate_bazi(date_str: str) -> dict:
     bazi_str=f"{year_gan_zhi}{month_gan_zhi}{day_gan_zhi}{hour_gan_zhi}"
 
     shishen = await calculate_shishen(baizi_list)
+    wuxing =  await calculate_wuxing(baizi_list)
 
     # 返回结果
     return {
         "bazi": baizi_list,
         "shishen": shishen,
+        "wuxing": wuxing,
         "xin_time": f"{year}年{month}月{day}日{hour}时",
         "nong_time": f"{lunar.getYearInChinese()}年{lunar.getMonthInChinese()}月{lunar.getDayInChinese()}"
     }

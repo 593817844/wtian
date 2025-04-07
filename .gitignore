@@ -2,6 +2,7 @@ __pycache__/
 logs/
 .env
 
+run-dev.sh
 
 .DS_Store
 node_modules/
