@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from utils import middleware,exceptions
 from fastapi.middleware.cors import CORSMiddleware
 from apps.bazi.view import app as bazi_app
+from apps.zhanbu.view import app as zhanbu_app
 
 def create_app() -> FastAPI:
     """工厂函数：创建App对象"""
@@ -25,7 +26,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],  # 允许所有请求头
     )
 
+    # 注册路由
     app.include_router(bazi_app)
+    app.include_router(zhanbu_app)
+    
     # 注册中间件函数
     http_middleware = app.middleware('http')
     http_middleware(middleware.log_requests)
