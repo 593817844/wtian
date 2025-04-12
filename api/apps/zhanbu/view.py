@@ -17,7 +17,6 @@ class ZhanbuRequest(BaseModel):
     gender: str  # "boy" 或 "girl"
     demand: str  # 如 "问事业"
     
-    
 
 
 @app.post("/zhanbu")

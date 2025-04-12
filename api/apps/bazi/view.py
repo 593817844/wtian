@@ -1,29 +1,31 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
+
 from langchain.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
 from langchain.schema import HumanMessage
 from datetime import datetime
 from utils import logs
-import os
 from .bazi import calculate_bazi
 from utils.commom import logger,read_prompt,chat
-
+from .scheams import PaipanRequest,PaipanResponse,FenxiRequest
 
 app =APIRouter()
 
 
-# 定义请求体的模型
-class BaziRequest(BaseModel):
-    birth: str  # 格式如 "19980218 06"
-    gender: str  # "boy" 或 "girl"
-    demand: str  # 如 "问事业"
-
-
-@app.post("/bazi")
-async def bazi(request: BaziRequest):
+@app.post("/bazi/paipan",response_model=PaipanResponse)
+async def paipan(request: PaipanRequest):
     # 构造返回数据
-    bazi = await calculate_bazi(request.birth)
+    bazi = calculate_bazi(request.birth)
+    resp = {
+        "gender": request.gender,
+        "old_birth": bazi["nong_time"],
+        "bazi": bazi["bazi"],
+        "shishen": bazi["shishen"],
+        "wuxing": bazi["wuxing"]
+    }
+    return resp
+
+@app.post("/bazi/fenxi")
+async def bazifenxi(request: FenxiRequest):
 
     # 从文件读取提示词模板
     template = await read_prompt("prompts/base.txt")
@@ -37,9 +39,9 @@ async def bazi(request: BaziRequest):
     # 填充模板
     input_prompt = prompt.format(
         gender=request.gender,
-        bazi=bazi["bazi"],
-        shishen=bazi["shishen"],
-        wuxing=bazi["wuxing"],
+        bazi=request.bazi,
+        shishen=request.shishen,
+        wuxing=request.wuxing,
         demand=request.demand,
         today=datetime.now()
     )
@@ -58,9 +60,5 @@ async def bazi(request: BaziRequest):
     
     return {
         "status": "success",
-        "gender": request.gender,
-        "bazi": bazi["bazi"],
-        "shishen": bazi["shishen"],
-        "wuxing": bazi["wuxing"],
         "result": response.content
     }

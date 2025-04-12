@@ -2,7 +2,7 @@ from lunar_python import Solar, Lunar
 from datetime import datetime
 
 
-async def calculate_wuxing(bazi_list: list)->list:
+def calculate_wuxing(bazi_list: list)->list:
     tiangan_wuxing = {
         '甲': '木', '乙': '木',  # 甲乙属木
         '丙': '火', '丁': '火',  # 丙丁属火
@@ -38,7 +38,7 @@ async def calculate_wuxing(bazi_list: list)->list:
     
     print(bazi_str)
 
-async def calculate_shishen(bazi_list: list)->list:
+def calculate_shishen(bazi_list: list)->list:
 
     # 天干五行和阴阳属性
     GAN_WUXING = {'甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'}
@@ -129,13 +129,40 @@ async def calculate_shishen(bazi_list: list)->list:
     return shishen_result
 
 
+# 映射到时辰
+def get_shichen(hour):
+    if 23 <= hour or hour < 1:
+        return "子时"
+    elif 1 <= hour < 3:
+        return "丑时"
+    elif 3 <= hour < 5:
+        return "寅时"
+    elif 5 <= hour < 7:
+        return "卯时"
+    elif 7 <= hour < 9:
+        return "辰时"
+    elif 9 <= hour < 11:
+        return "巳时"
+    elif 11 <= hour < 13:
+        return "午时"
+    elif 13 <= hour < 15:
+        return "未时"
+    elif 15 <= hour < 17:
+        return "申时"
+    elif 17 <= hour < 19:
+        return "酉时"
+    elif 19 <= hour < 21:
+        return "戌时"
+    else:  # 21 <= hour < 23
+        return "亥时"
 
 
-
-async def calculate_bazi(date_str: str) -> dict:
+def calculate_bazi(date_str: str) -> dict:
     # 解析新历日期
     dt = datetime.strptime(date_str, "%Y%m%d %H")
     year, month, day, hour = dt.year, dt.month, dt.day, dt.hour
+
+    shichen = get_shichen(hour)
 
     # 将新历转换为农历
     solar = Solar.fromYmdHms(year, month, day, hour, 0, 0)
@@ -156,8 +183,8 @@ async def calculate_bazi(date_str: str) -> dict:
 
     bazi_str=f"{year_gan_zhi}{month_gan_zhi}{day_gan_zhi}{hour_gan_zhi}"
 
-    shishen = await calculate_shishen(baizi_list)
-    wuxing =  await calculate_wuxing(baizi_list)
+    shishen =calculate_shishen(baizi_list)
+    wuxing =calculate_wuxing(baizi_list)
 
     # 返回结果
     return {
@@ -165,7 +192,7 @@ async def calculate_bazi(date_str: str) -> dict:
         "shishen": shishen,
         "wuxing": wuxing,
         "xin_time": f"{year}年{month}月{day}日{hour}时",
-        "nong_time": f"{lunar.getYearInChinese()}年{lunar.getMonthInChinese()}月{lunar.getDayInChinese()}"
+        "nong_time": f"{lunar.getYearInChinese()}年{lunar.getMonthInChinese()}月{lunar.getDayInChinese()}{shichen}"
     }
 
 # 测试
