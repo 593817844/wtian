@@ -1,9 +1,19 @@
 import os
 from fastapi import FastAPI
-from utils import middleware,exceptions
+from utils import middleware,exceptions,redis_tools
 from fastapi.middleware.cors import CORSMiddleware
 from apps.bazi.view import app as bazi_app
 from apps.zhanbu.view import app as zhanbu_app
+
+
+
+REDIS = {
+    'host': os.environ.get('RD_HOST', '127.0.0.1'), # 数据库地址
+    'port': os.environ.get('RD_PORT', 6379),        # 数据库端口
+    'db': os.environ.get('RD_DB', 0),               # 数据库名
+    'username':  os.environ.get('RD_USERNAME', ''), # 用户名
+    'password':  os.environ.get('RD_PASSWORD', ''), # 密码
+}
 
 def create_app() -> FastAPI:
     """工厂函数：创建App对象"""
@@ -17,6 +27,13 @@ def create_app() -> FastAPI:
         }
     )
 
+
+    #redis连接对象注册到App应用对象中
+    redis_tools.register_redis(
+        app,
+        config=REDIS,
+    )
+    
     # 允许跨域的来源，可以设置为前端的 URL 地址
     app.add_middleware(
         CORSMiddleware,
