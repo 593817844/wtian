@@ -41,3 +41,6 @@ async def check_ip_access(request: Request, redis: aioredis.Redis = Depends(get_
 
     await redis.incr(redis_key)
     await redis.expire(redis_key, 86400)  # 设置过期时间为一天 (86400 秒)
+    return {
+        "status": "success"
+    }
