@@ -137,18 +137,18 @@ def generate_hexagram():
 
     # 组合卦象信息
     result = {
-        'original': {
-            'gua_name': get_64gua((get_trigram(original_yaos[0:3]),get_trigram(original_yaos[3:6]))),
-            'yaos': original_yaos,
-            'lower': get_trigram(original_yaos[0:3]),
-            'upper': get_trigram(original_yaos[3:6]),
-            'moving': moving_positions,
+        'bengua': {
+            'gua': get_64gua((get_trigram(original_yaos[0:3]),get_trigram(original_yaos[3:6]))),
+            'yao': original_yaos,
+            'xiagua': get_trigram(original_yaos[0:3]),
+            'shanggua': get_trigram(original_yaos[3:6]),
+            'dongyao': moving_positions,
         },
-        'changed': {
-            'gua_name': get_64gua((get_trigram(changed_yaos[0:3]),get_trigram(changed_yaos[3:6]))),
-            'yaos': changed_yaos,
-            'lower': get_trigram(changed_yaos[0:3]),
-            'upper': get_trigram(changed_yaos[3:6]),
+        'biangua': {
+            'gua': get_64gua((get_trigram(changed_yaos[0:3]),get_trigram(changed_yaos[3:6]))),
+            'yao': changed_yaos,
+            'xiagua': get_trigram(changed_yaos[0:3]),
+            'shanggua': get_trigram(changed_yaos[3:6]),
         }
     }
     return result

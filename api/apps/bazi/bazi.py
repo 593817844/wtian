@@ -192,7 +192,7 @@ def calculate_bazi(date_str: str) -> dict:
         "shishen": shishen,
         "wuxing": wuxing,
         "xin_time": f"{year}年{month}月{day}日{hour}时",
-        "nong_time": f"{lunar.getYearInChinese()}年{lunar.getMonthInChinese()}月{lunar.getDayInChinese()}{shichen}"
+        "nong_time": f"{lunar.getYearInChinese()}年 {lunar.getMonthInChinese()}月 {lunar.getDayInChinese()} {shichen}"
     }
 
 # 测试

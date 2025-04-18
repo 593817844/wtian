@@ -1,5 +1,4 @@
 from fastapi import APIRouter,Depends
-from typing import Optional
 from utils.access_limit import check_ip_access
 
 from langchain.prompts import PromptTemplate
@@ -28,7 +27,9 @@ async def paipan(request: PaipanRequest):
 
 @app.post("/bazi/fenxi")
 async def bazifenxi(request: FenxiRequest,ip_check=Depends(check_ip_access)):
-
+    print(ip_check)
+    if ip_check["status"] == "limited":
+        return ip_check
     # 从文件读取提示词模板
     template = await read_prompt("prompts/base.txt")
 

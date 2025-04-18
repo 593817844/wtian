@@ -9,7 +9,7 @@
     - 卦名：{gua}
     - 下卦：{ben_xiagua}
     - 上卦：{ben_shanggua}
-    - 动爻：{donggua} (由下往上算)
+    - 动爻：{dongyao} (由下往上算)
   变卦：
     - 卦名：{biangua}
     - 下卦：{bian_xiagua}

@@ -1,11 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Depends
 from pydantic import BaseModel
 from langchain.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
 from langchain.schema import HumanMessage
-from datetime import datetime
-import os
 from utils.commom import logger,read_prompt,chat
+from utils.access_limit import check_ip_access
 from .zhanbu import generate_hexagram
 
 app =APIRouter()
@@ -20,15 +18,18 @@ class ZhanbuRequest(BaseModel):
 
 
 @app.post("/zhanbu")
-async def zhanbu(request: ZhanbuRequest):
+async def zhanbu(request: ZhanbuRequest,ip_check=Depends(check_ip_access)):
+    print(ip_check)
+    if ip_check["status"] == "limited":
+        return ip_check
     zhanbu = generate_hexagram()
-    
+    print(zhanbu)
     # 从文件读取提示词模板
     template = await read_prompt("prompts/zhanbu.txt")
 
     # 创建 PromptTemplate
     prompt = PromptTemplate(
-        input_variables=["gender", "demand", "gua", "ben_xiagua", "ben_shanggua", "donggua","biangua","bian_xiagua","bian_shangua"],
+        input_variables=["gender", "demand", "gua", "ben_xiagua", "ben_shanggua", "dongyao","biangua","bian_xiagua","bian_shangua"],
         template=template
     )
 
@@ -36,13 +37,13 @@ async def zhanbu(request: ZhanbuRequest):
     input_prompt = prompt.format(
         gender=request.gender,
         demand=request.demand,
-        gua=zhanbu["original"]["gua_name"],
-        ben_xiagua=zhanbu["original"]["lower"],
-        ben_shanggua=zhanbu["original"]["upper"],
-        donggua=zhanbu["original"]["moving"],
-        biangua=zhanbu["changed"]["gua_name"],
-        bian_xiagua=zhanbu["changed"]["lower"],
-        bian_shangua=zhanbu["changed"]["upper"]
+        gua=zhanbu["bengua"]["gua"],
+        ben_xiagua=zhanbu["bengua"]["xiagua"],
+        ben_shanggua=zhanbu["bengua"]["shanggua"],
+        dongyao=zhanbu["bengua"]["dongyao"],
+        biangua=zhanbu["biangua"]["gua"],
+        bian_xiagua=zhanbu["biangua"]["xiagua"],
+        bian_shangua=zhanbu["biangua"]["shanggua"]
     )
 
     # 定义消息
@@ -59,10 +60,10 @@ async def zhanbu(request: ZhanbuRequest):
         "status": "success",
         "gender": request.gender,
         "demand": request.demand,
-        "gua": zhanbu["original"]["gua_name"],
-        "donggua": zhanbu["original"]["moving"],
-        "biangua":zhanbu["changed"]["gua_name"],
+        "gua": zhanbu["bengua"]["gua"],
+        "dongyao": zhanbu["bengua"]["dongyao"],
+        "biangua":zhanbu["biangua"]["gua"],
         "result": response.content
     }
-    
+
 
