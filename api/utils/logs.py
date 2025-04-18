@@ -54,6 +54,8 @@ def getLogger(name: str='root') -> Logger:
     return logger
 
 
+logger = getLogger(os.environ.get('APP_NAME', "wtian"))
+
 if __name__ == '__main__':
     logger = getLogger('dl')
     logger.info("这里是常规运行日志")

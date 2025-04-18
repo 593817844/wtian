@@ -4,7 +4,7 @@ from utils.access_limit import check_ip_access
 from langchain.prompts import PromptTemplate
 from langchain.schema import HumanMessage
 from datetime import datetime
-from utils import logs
+from utils.logs import logger
 from .bazi import calculate_bazi
 from utils.commom import logger,read_prompt,chat
 from .scheams import PaipanRequest,PaipanResponse,FenxiRequest
@@ -27,7 +27,8 @@ async def paipan(request: PaipanRequest):
 
 @app.post("/bazi/fenxi")
 async def bazifenxi(request: FenxiRequest,ip_check=Depends(check_ip_access)):
-    print(ip_check)
+    # print(ip_check)
+    logger.info(ip_check)
     if ip_check["status"] == "limited":
         return ip_check
     # 从文件读取提示词模板

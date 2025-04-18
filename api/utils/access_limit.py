@@ -2,6 +2,7 @@ from fastapi import Depends,Request
 from redis import asyncio as aioredis
 from utils.redis_tools import get_redis
 import os,time
+from utils.logs import logger
 
 WHITELIST_IPS = os.getenv("WHITELIST_IPS", "").split(",")
 ACCESS_LIMIT_PER_DAY = int(os.getenv("ACCESS_LIMIT_PER_DAY", 1))  # 默认值为1
@@ -10,7 +11,8 @@ async def check_ip_access(request: Request, redis: aioredis.Redis = Depends(get_
     
     """检查 IP 访问限制"""
     client_ip = request.headers.get("x-real-ip") or request.client.host
-    print(f"ip: {client_ip}")
+    # print(f"ip: {client_ip}")
+    logger.info(f"ip: {client_ip}")
     if client_ip in WHITELIST_IPS:
         return  {
             "status": "success",
@@ -20,7 +22,8 @@ async def check_ip_access(request: Request, redis: aioredis.Redis = Depends(get_
     redis_key = f"ip_access:{client_ip}:{time.strftime('%Y%m%d')}"
     
     access_count = await redis.get(redis_key)
-    print(f"访问次数{access_count}")
+    # print(f"访问次数{access_count}")
+    logger.info(f"访问次数{access_count}")
     if access_count is None:
         access_count = 0
     else:
