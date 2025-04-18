@@ -1,5 +1,44 @@
 version : '3.8'
 services:
+  wtian-redis:
+    container_name: wtian-redis
+    image: redis:6.2
+    ports:
+      - "16666:6379"
+    volumes:
+      - ./redis/conf/redis.conf:/etc/redis.conf
+      - ./redis/data:/data
+    command: redis-server /etc/redis.conf
+  wtian-api:
+    container_name: wtian-api
+    image: wtian-api:20250418
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: "wtian"
+      DASHSCOPE_API_KEY: "sk-699e8f57dfbb4509a1f9fb06e8d485ab"
+      RD_HOST: "wtian-redis"
+      RD_PORT: "6379"
+      RD_DB: 0
+      RD_PASSWORD: "123456"
+      WHITELIST_IPS: "127.0.0.1"
+      ACCESS_LIMIT_PER_DAY: 10
+    command: ["gunicorn","-w","2","-k","uvicorn.workers.UvicornWorker","main:app","--bind","0.0.0.0:8000"]
+    depends_on:
+      - wtian-redis
+  wtian-nginx:
+    container_name: wtian-nginx
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/dist:/usr/share/nginx/html
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/logs:/var/log/nginx
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - wtian-redis
+      - wtian-api
   #wtian-mysql:
   #  container_name: wtian-mysql
   #  image: mysql:5.7
@@ -21,45 +60,3 @@ services:
   #  environment:
   #    MYSQL_DATABASE: 'wtian'
   #    MYSQL_ROOT_PASSWORD: password
-  wtian-redis:
-    container_name: wtian-redis
-    image: redis:6.2
-    ports:
-      - "16666:6379"
-    volumes:
-      - ./redis/conf/redis.conf:/etc/redis.conf
-      - ./redis/data:/data
-    command: redis-server /etc/redis.conf
-  wtian-api:
-    container_name: wtian-api
-    image: wtian-api
-    ports:
-      - "8000:8000"
-    environment:
-      APP_NAME: "wtian"
-      WORKERS: 2
-      DASHSCOPE_API_KEY: "sk-699e8f57dfbb4509a1f9fb06e8d485ab"
-      RD_HOST: "wtian-redis"
-      RD_PORT: "6379"
-      RD_DB: 0
-      RD_PASSWORD: "123456"
-      WHITELIST_IPS: "127.0.0.1"
-    command: [
-      "gunicorn","-w","$WORKERS","-k","uvicorn.workers.UvicornWorker","main:app","--bind","0.0.0.0:8000"
-    ]
-
-    depends_on:
-      - wtian-redis
-  wtian-nginx:
-    container_name: wtian-nginx
-    image: nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/dist:/usr/share/nginx/html
-      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/logs:/var/log/nginx
-      - ./nginx/conf.d:/etc/nginx/conf.d
-    depends_on:
-      - wtian-redis
-      - wtian-api
