@@ -9,8 +9,34 @@
       </template>
       <div class="prose text-gray-700 leading-relaxed">
         <p class="text-lg intro-text">
-          欢迎踏入问天易经智能体的奇妙世界！在这里，古老的东方智慧与前沿的人工智能技术交织碰撞，为你开启一场探索自我、洞察未来的旅程。准备好迎接“易经+大模型”带来的震撼体验了吗？
+          欢迎踏入问天易经智能体的奇妙世界！在这里，我们融合了古老的东方智慧与尖端的人工智能技术，为你开启一场探索自我、洞察未来的旅程。准备好迎接“易经+大模型”带来的震撼体验了吗？
         </p>
+
+        <h4 class="text-xl font-semibold mt-6 mb-3 text-indigo-800 section-title">技术亮点</h4>
+        <ul class="tech-list">
+          <li class="tech-item">
+            <span class="tech-icon"><i class="iconfont icon-jishuzhichi"></i></span>
+            <div class="tech-content">
+              <strong class="tech-name">核心技术解析：</strong>
+              <p>
+                我们融合了<strong>公式测算</strong>、<strong>数百本易经名著 RAG (Retrieval-Augmented Generation) 技术</strong>以及 <strong>DeepSeek R1 大模型</strong>，
+                打造了智能、精准的易经命理分析系统。
+              </p>
+              <ul>
+                <li>
+                  <strong>公式测算：</strong> 基于传统八字命理的严谨公式，确保命盘分析的准确性。
+                </li>
+                <li>
+                  <strong>RAG 增强：</strong> 通过 RAG 技术，模型能够从海量易经名著中检索相关知识，提供更全面深入的解读。
+                </li>
+                <li>
+                  <strong>DeepSeek R1 解读：</strong> 采用 DeepSeek R1 大模型对卦象进行深度解读，挖掘更深层次的含义，提供更具价值的建议。
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+
         <h4 class="text-xl font-semibold mt-6 mb-3 text-indigo-800 section-title">功能亮点</h4>
         <ul class="feature-list">
           <li class="feature-item">
@@ -28,6 +54,7 @@
             </div>
           </li>
         </ul>
+
         <p class="call-to-action">
           还在犹豫什么？点击顶部导航栏，即刻开启你的专属命理探索之旅！让问天易经智能体成为你人生道路上的智慧伙伴，助你把握机遇，迎接挑战，创造属于自己的精彩篇章！
         </p>
@@ -180,5 +207,51 @@ export default {
 
 .disclaimer p {
   margin-bottom: 0.25rem;
+}
+
+/* 技术亮点样式 */
+.tech-list {
+  list-style: none;
+  padding: 0;
+}
+
+.tech-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: rgba(240, 244, 255, 0.7); /* 浅色背景 */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.tech-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #d1c4e9; /* 浅紫色 */
+  color: #673ab7; /* 深紫色 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  margin-right: 20px;
+}
+
+.tech-content {
+  flex: 1;
+}
+
+.tech-content ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+.tech-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #5e35b1; /* 深紫色 */
+  margin-bottom: 5px;
 }
 </style>
