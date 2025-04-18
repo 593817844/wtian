@@ -9,7 +9,7 @@ ACCESS_LIMIT_PER_DAY = int(os.getenv("ACCESS_LIMIT_PER_DAY", 1))  # 默认值为
 async def check_ip_access(request: Request, redis: aioredis.Redis = Depends(get_redis)):
     
     """检查 IP 访问限制"""
-    client_ip = request.client.host
+    client_ip = request.headers.get("x-real-ip") or request.client.host
     print(f"ip: {client_ip}")
     if client_ip in WHITELIST_IPS:
         return  {
