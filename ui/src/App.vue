@@ -2,7 +2,18 @@
   <a-layout class="layout">
     <a-layout-header class="header">
       <div class="logo">问天易经AI</div>
+      <!-- 移动端汉堡菜单按钮 -->
+      <a-button
+        class="menu-toggle"
+        type="text"
+        @click="toggleDrawer"
+        v-if="isMobile"
+      >
+        <MenuOutlined />
+      </a-button>
+      <!-- 桌面端水平菜单 -->
       <a-menu
+        v-if="!isMobile"
         v-model:selectedKeys="current"
         theme="dark"
         mode="horizontal"
@@ -22,6 +33,34 @@
           64卦占卜
         </a-menu-item>
       </a-menu>
+      <!-- 移动端抽屉菜单 -->
+      <a-drawer
+        title="菜单"
+        placement="right"
+        :visible="drawerVisible"
+        @close="toggleDrawer"
+        class="mobile-menu"
+      >
+        <a-menu
+          v-model:selectedKeys="current"
+          mode="vertical"
+          theme="light"
+          @click="handleMenuClick"
+        >
+          <a-menu-item key="home">
+            <HomeOutlined />
+            首页
+          </a-menu-item>
+          <a-menu-item key="bazi">
+            <CalculatorOutlined />
+            八字测算
+          </a-menu-item>
+          <a-menu-item key="guagua">
+            <CompassOutlined />
+            64卦占卜
+          </a-menu-item>
+        </a-menu>
+      </a-drawer>
     </a-layout-header>
     <a-layout-content class="content">
       <a-breadcrumb style="margin: 16px 0; font-size: 14px;">
@@ -40,58 +79,85 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { HomeOutlined, CalculatorOutlined, CompassOutlined } from '@ant-design/icons-vue';
+import {
+  HomeOutlined,
+  CalculatorOutlined,
+  CompassOutlined,
+  MenuOutlined,
+} from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useWindowSize } from '@vueuse/core';
 
 const router = useRouter();
 const route = useRoute();
 
-const current = computed(() => {
-  return [route.name || 'home']; // Use 'home' as the key to match the menu
-});
+// 检测屏幕是否为移动端
+const { width } = useWindowSize();
+const isMobile = computed(() => width.value <= 768);
 
+// 控制抽屉显示
+const drawerVisible = ref(false);
+const toggleDrawer = () => {
+  drawerVisible.value = !drawerVisible.value;
+};
+
+// 菜单选中状态
+const current = computed(() => [route.name?.toLowerCase() || 'home']);
+
+// 路由跳转
 const goToRoute = (routeName) => {
   router.push({ name: routeName });
+  if (isMobile.value) {
+    drawerVisible.value = false; // 移动端选择后关闭抽屉
+  }
+};
+
+// 处理抽屉菜单点击
+const handleMenuClick = ({ key }) => {
+  const routeMap = {
+    home: 'Home',
+    bazi: 'Bazi',
+    guagua: 'Gua',
+  };
+  goToRoute(routeMap[key]);
 };
 </script>
 
 <style scoped>
 .layout {
   min-height: 100vh;
-  background: #f0f2f5; /* Light background for the entire layout */
+  background: #f0f2f5;
 }
 
-/* Header Styling */
 .header {
-  background: linear-gradient(90deg, #1e3a8a, #3b82f6); /* Gradient header */
+  background: linear-gradient(90deg, #1e3a8a, #3b82f6);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
 }
 
 .logo {
-  float: left;
-  width: auto;
-  height: 31px;
-  margin: 16px 24px 16px 0;
   color: white;
-  text-align: center;
-  line-height: 31px;
   font-size: 22px;
   font-weight: bold;
-  padding: 0 12px;
+  line-height: 31px;
+  margin: 16px 24px 16px 0;
   transition: transform 0.3s ease;
 }
 
 .logo:hover {
-  transform: scale(1.05); /* Slight zoom effect on hover */
+  transform: scale(1.05);
 }
 
-/* Transparent Menu */
 .transparent-menu {
   background: transparent !important;
   border-bottom: none;
+  flex: 1;
 }
 
 .transparent-menu .ant-menu-item {
@@ -111,9 +177,13 @@ const goToRoute = (routeName) => {
   border-bottom: 2px solid white;
 }
 
-/* Content Styling */
+.menu-toggle {
+  color: white;
+  font-size: 20px;
+}
+
 .content {
-  padding: 0 50px; /* Default padding for larger screens */
+  padding: 0 50px;
   margin-top: 24px;
 }
 
@@ -121,17 +191,16 @@ const goToRoute = (routeName) => {
   background: #ffffff;
   padding: 32px;
   min-height: 280px;
-  margin: 0 50px; /* Default margin for larger screens */
+  margin: 0 50px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s ease;
 }
 
 .content-wrapper:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); /* Enhanced shadow on hover */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* Footer Styling */
 .footer {
   text-align: center;
   background: #ffffff;
@@ -141,20 +210,19 @@ const goToRoute = (routeName) => {
   border-top: 1px solid #e8e8e8;
 }
 
-/* Responsive Design: Remove padding and margins on smaller screens */
 @media (max-width: 768px) {
   .content {
-    padding: 0; /* Remove padding on smaller screens */
+    padding: 0;
   }
 
   .content-wrapper {
-    margin: 0; /* Remove margin on smaller screens */
-    border-radius: 0; /* Remove rounded corners for full-width */
-    box-shadow: none; /* Remove shadow on mobile for cleaner look */
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .header {
-    padding: 0 16px; /* Adjust header padding for mobile */
+    padding: 0 16px;
   }
 
   .logo {
@@ -162,16 +230,11 @@ const goToRoute = (routeName) => {
     margin: 16px 16px 16px 0;
   }
 
-  .transparent-menu .ant-menu-item {
-    font-size: 14px; /* Smaller font for mobile */
-  }
-
   .footer {
     padding: 16px;
   }
 }
 
-/* Dark Theme Adjustments */
 [data-theme='dark'] .layout {
   background: #1f1f1f;
 }
