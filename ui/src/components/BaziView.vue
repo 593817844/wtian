@@ -95,9 +95,11 @@ export default {
 
     const onBirthDateChange = (date, dateString) => {
       if (dateString) {
-        baziInput.value.birth = dateString.replace(/[-: ]/g, '');
-        const hour = moment(date).format('HH');
-        baziInput.value.birth = baziInput.value.birth.slice(0, 8) + ' ' + hour;
+        // 使用 dayjs 处理时间，确保正确获取小时
+        const formattedDate = dayjs(date);
+        const hour = formattedDate.format('HH');
+        const datePart = formattedDate.format('YYYYMMDD');
+        baziInput.value.birth = `${datePart} ${hour}`;
       } else {
         baziInput.value.birth = '';
       }

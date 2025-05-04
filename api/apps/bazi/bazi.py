@@ -205,7 +205,7 @@ if __name__ == "__main__":
     import asyncio
     
     async def test():
-        result = await calculate_bazi("19980214 06")
+        result =  calculate_bazi("19980214 06")
         print(result)
     
     asyncio.run(test())
