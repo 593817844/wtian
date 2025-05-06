@@ -4,10 +4,21 @@
       <h2 class="text-2xl font-semibold text-gray-700">八字排盘</h2>
     </template>
     <a-form :model="baziInput" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-      <!-- 出生日期和性别 纵向排列 -->
+      <!-- 日历类型和出生日期 纵向排列 -->
       <a-row>
         <a-col :span="24">
-          <a-form-item label="出生日期(新历)" class="form-item-stacked">
+          <a-form-item label="日历类型" class="form-item-stacked">
+            <a-radio-group v-model:value="is_lunar" @change="onCalendarTypeChange">
+              <a-radio :value="false">公历</a-radio>
+              <a-radio :value="true">农历</a-radio>
+            </a-radio-group>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row>
+        <a-col :span="24">
+          <a-form-item :label="is_lunar ? '出生日期(农历)' : '出生日期(公历)'" class="form-item-stacked">
             <a-date-picker
               v-model:value="birthDate"
               show-time
@@ -43,6 +54,7 @@
     <div v-if="baziResult" class="mt-6">
       <h3 class="text-xl font-semibold text-gray-700 mb-4">排盘结果</h3>
       <a-descriptions :column="1" bordered>
+        <a-descriptions-item label="公历">{{ baziResult.new_birth }}</a-descriptions-item>
         <a-descriptions-item label="农历">{{ baziResult.old_birth }}</a-descriptions-item>
         <a-descriptions-item label="八字">{{ baziResult.bazi.join(' ') }}</a-descriptions-item>
         <a-descriptions-item label="十神">{{ baziResult.shishen.join(' ') }}</a-descriptions-item>
@@ -51,9 +63,11 @@
           金{{ baziResult.wuxing.金 }}% 水{{ baziResult.wuxing.水 }}%
         </a-descriptions-item>
       </a-descriptions>
-      <a-button type="primary" @click="fetchFenxi" :loading="loadingFenxi" class="w-full mt-4">
-        分析命盘
-      </a-button>
+      <div class="text-center">
+        <a-button type="primary" @click="fetchFenxi" :loading="loadingFenxi" class="mt-4">
+          分析命盘
+        </a-button>
+      </div>
     </div>
 
     <!-- 分析结果 -->
@@ -84,14 +98,18 @@ dayjs.locale('zh-cn'); // 设置全局的 dayjs 本地化
 export default {
   name: 'BaziView',
   setup() {
-    const baziInput = ref({ birth: '', gender: 'boy' });
+    const baziInput = ref({ birth: '', gender: 'boy', is_lunar: false });
     const birthDate = ref(null);
     const baziResult = ref(null);
     const fenxiResult = ref(null);
     const loadingBazi = ref(false);
     const loadingFenxi = ref(false);
     const locale = ref(zhCN); // Set locale
+    const is_lunar = ref(false); // 默认使用公历
 
+    const onCalendarTypeChange = (e) => {
+      baziInput.value.is_lunar = e.target.value;
+    };
 
     const onBirthDateChange = (date, dateString) => {
       if (dateString) {
@@ -118,7 +136,11 @@ export default {
       console.log('baziInput.value:', baziInput.value); // Inspect the input
 
       try {
-        const response = await axios.post(`${API_BASE_URL}/bazi/paipan`, baziInput.value);
+        const response = await axios.post(`${API_BASE_URL}/bazi/paipan`, {
+          birth: baziInput.value.birth,
+          gender: baziInput.value.gender,
+          is_lunar: baziInput.value.is_lunar
+        });
         console.log('response.data:', response.data); // Inspect the response
 
         if (response.data && typeof response.data === 'object') {
@@ -179,6 +201,8 @@ export default {
       fenxiResult,
       loadingBazi,
       loadingFenxi,
+      is_lunar,
+      onCalendarTypeChange,
       onBirthDateChange,
       fetchBazi,
       fetchFenxi,

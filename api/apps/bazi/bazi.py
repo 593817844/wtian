@@ -1,6 +1,6 @@
 from lunar_python import Solar, Lunar
 from datetime import datetime
-
+from lunardate import LunarDate
 
 def calculate_wuxing(bazi_list: list)->list:
     tiangan_wuxing = {
@@ -157,10 +157,47 @@ def get_shichen(hour):
         return "亥时"
 
 
-def calculate_bazi(date_str: str) -> dict:
-    # 解析新历日期
+
+
+def lunar_to_solar(date_str:str):
+    """
+    将给定的农历日期转换为对应的公历日期。
+    
+    参数:
+    - lunar_year: 农历年份
+    - lunar_month: 农历月份 (1-12)
+    - lunar_day: 农历日 (1-30)
+    - is_leap: 是否为闰月，默认值为False
+    
+    返回:
+    - 对应的公历日期(datetime.date对象)
+    """
     dt = datetime.strptime(date_str, "%Y%m%d %H")
-    year, month, day, hour = dt.year, dt.month, dt.day, dt.hour
+    lunar_year, lunar_month, lunar_day, hour = dt.year, dt.month, dt.day, dt.hour
+    run_month=LunarDate.leapMonthForYear(lunar_year)
+    print(run_month)
+    if run_month == lunar_month:
+        is_leap = True
+    else:
+        is_leap = False
+    
+    # 创建LunarDate对象
+    lunar_date = LunarDate(lunar_year, lunar_month, lunar_day, is_leap)
+    # 转换为公历日期
+    solar_date = lunar_date.toSolarDate()
+    str_solar_date=solar_date.strftime("%Y%m%d")
+    str=f"{str_solar_date} {hour}"
+    return str
+
+def calculate_bazi(date_str: str,is_lunar:bool=False) -> dict:
+    if is_lunar:
+        str_solar_date=lunar_to_solar(date_str)
+        dt = datetime.strptime(str_solar_date, "%Y%m%d %H")
+        year, month, day, hour = dt.year, dt.month, dt.day, dt.hour
+    else:
+        # 解析新历日期
+        dt = datetime.strptime(date_str, "%Y%m%d %H")
+        year, month, day, hour = dt.year, dt.month, dt.day, dt.hour
 
     shichen = get_shichen(hour)
 
@@ -200,12 +237,19 @@ def calculate_bazi(date_str: str) -> dict:
 #     result = calculate_shishen("戊寅甲寅壬辰癸卯")
 #     print(result)
 
+
+
+
+
 # 测试（异步函数需要用事件循环运行）
 if __name__ == "__main__":
     import asyncio
     
     async def test():
-        result =  calculate_bazi("19980214 06")
+        # result =  calculate_bazi("19980214 06",False)
+        result =  calculate_bazi("19980118 06",True)
+        # result = lunar_to_solar(1998, 1, 18)
+        # result = lunar_to_solar("20230201 06")
         print(result)
     
     asyncio.run(test())

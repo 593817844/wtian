@@ -15,10 +15,11 @@ app =APIRouter()
 @app.post("/bazi/paipan",response_model=PaipanResponse)
 async def paipan(request: PaipanRequest):
     # 构造返回数据
-    bazi = calculate_bazi(request.birth)
+    bazi = calculate_bazi(request.birth,request.is_lunar)
     resp = {
         "gender": request.gender,
         "old_birth": bazi["nong_time"],
+        "new_birth": bazi["xin_time"],
         "bazi": bazi["bazi"],
         "shishen": bazi["shishen"],
         "wuxing": bazi["wuxing"]
