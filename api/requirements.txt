@@ -5,3 +5,4 @@ gunicorn==23.0.0
 uvicorn==0.34.0
 lunar-python==1.4.2
 langchain-openai==0.3.6
+lunardate==0.2.2
